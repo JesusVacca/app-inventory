@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Bienvenido</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="page">
+    <div class="page__content__login">
+        <div class="form__container">
+            <div class="form__header">
+                <div class="form__icon">
+                    <svg class="icon icon--shield" width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L4 6V11C4 16.55 7.84 21.74 12 23C16.16 21.74 20 16.55 20 11V6L12 2Z" fill="currentColor"/>
+                        <path d="M12 8C10.9 8 10 8.9 10 10V11H9V15H15V11H14V10C14 8.9 13.1 8 12 8ZM12 9C12.6 9 13 9.4 13 10V11H11V10C11 9.4 11.4 9 12 9Z" fill="white"/>
+                    </svg>
+                </div>
+                <h1 class="form__title">Bienvenido</h1>
+                <p class="form__subtitle">Para continuar, por favor ingresa tus credenciales.</p>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form__group">
+                    <div class="relative">
+                        <input
+                                class="form__input"
+                                type="text"
+                                name="username"
+                                id="id_username"
+                                placeholder=""
+                                required
+                        >
+                        <label class="form__label" for="id_username">Nombre de usuario</label>
+                    </div>
+                </div>
+                <div class="form__group">
+                    <div class="relative">
+                        <input
+                                class="form__input"
+                                type="password"
+                                name="password"
+                                id="id_password"
+                                placeholder=""
+                                required
+                        >
+                        <label class="form__label" for="id_password">Contraseña</label>
+                        <button class="form__button__icon" type="button" id="buttonTogglePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form__group">
+                    <button class="button button--fw" type="submit">Ingresar</button>
+                </div>
+                <a class="form__link" href="#">
+                    ¿Olvidó su contraseña?
+                </a>
+            </form>
+        </div>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded',()=>{
+
+            {% if messages %}
+            const MESSAGES = []
+            {% for message in messages %}
+                MESSAGES.push({
+                    "title": "{{ message|escapejs }}",
+                    "icon": "{{ message.tags|escapejs }}"
+
+                })
+            {% endfor %}
+
+            function showAlert(index = 0) {
+                if (MESSAGES.length > index){
+                    Swal.fire({
+                      text: MESSAGES[index].title,
+                      icon: MESSAGES[index].icon,
+                      title: MESSAGES[index].icon.toUpperCase(),
+                      timer: 6000,
+                    })
+                    .then((result) => {
+                        showAlert(index + 1)
+                    })
+                }
+            }
+            showAlert();
+        {% endif %}
+
+
+            const buttonTogglePassword = document.getElementById('buttonTogglePassword');
+            const password = document.getElementById('id_password');
+            buttonTogglePassword.addEventListener('click',()=>{
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                buttonTogglePassword.innerHTML = type === 'text'?'<i class="bi bi-eye-slash"></i>':'<i class="bi bi-eye"></i>';
+
+            })
+        })
+
+    </script>
+
+</body>
+</html>

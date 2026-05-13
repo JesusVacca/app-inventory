@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+            Default
+        {% endblock title %}
+    </title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+<body>
+    <div class="page">
+        <aside class="sidebar">
+            <header class="sidebar__header">
+                <i class="bi bi-shop-window"></i>
+                <span class="sidebar__title">Pink Notes</span>
+            </header>
+            <ul class="menu">
+                <li class="menu__item">
+                    <a class="menu__link" href="{% url 'core:dashboard:dashboard' %}">
+                        <i class="bi bi-house"></i>
+                        <span class="menu__title">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu__item">
+                    <a class="menu__link" href="{% url 'core:accounts:member-list' %}">
+                        <i class="bi bi-people"></i>
+                        <span class="menu__title">Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu__item menu__item--dropdown">
+                    <button class="menu__link dropdown__toggle">
+                        <i class="bi bi-boxes"></i>
+                        <span class="menu__title">Inventario</span>
+                        <i class="bi bi-caret-down dropdown__icon"></i>
+                    </button>
+
+                    <ul class="dropdown__menu">
+                        <li>
+                            <a href="{% url 'core:products:list' %}" class="dropdown__link">
+                                <i class="bi bi-box-seam"></i>
+                                Productos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'core:products:category-list' %}" class="dropdown__link">
+                                <i class="bi bi-tags"></i>
+                                Categorías
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'core:products:inventory-output' %}" class="dropdown__link">
+                                <i class="bi bi-arrow-up-right-circle"></i>
+                                Salidas
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'core:products:inventory-input' %}" class="dropdown__link">
+                                <i class="bi bi-arrow-down-left-circle"></i>
+                                Entradas
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu__item">
+                    <a class="menu__link" href="{% url 'core:orders:list' %}">
+                        <i class="bi bi-receipt"></i>
+                        <span class="menu__title">Ventas</span>
+                    </a>
+                </li>
+                <li class="menu__item">
+                    <a class="menu__link" href="{% url 'core:orders:sale-payments' %}">
+                        <i class="bi bi-cash-coin"></i>
+                        <span class="menu__title">Abonos</span>
+                    </a>
+                </li>
+
+                <li class="menu__item logout">
+                    <a
+                            class="menu__link"
+                            data-url="{% url 'core:accounts:logout' %}"
+                    >
+                        <i class="bi bi-door-open"></i>
+                        <span class="menu__title">Cerrar sesión</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        <main class="page__content">
+            <header class="page__header">
+                <p class="page__header__message"></p>
+                <p
+                        class="badge badge--normal"
+                        title="Usuario activo"
+                >
+                    <i class="bi bi-person-circle"></i>
+                    <span>{{ request.user.full_name }}</span>
+                </p>
+            </header>
+            {% block main %}
+            {% endblock main %}
+        </main>
+        {% include 'components/custom_toast.html' with toast_data=app_alerts %}
+    </div>
+    <script src="{% static 'scripts/index.js' %}"></script>
+    {% if messages %}
+    <script>
+        window.addEventListener('DOMContentLoaded',()=>{
+            const MESSAGES = []
+            {% for message in messages %}
+                MESSAGES.push({
+                    "title": "{{ message|escapejs }}",
+                    "icon": "{{ message.tags|escapejs }}"
+
+                })
+            {% endfor %}
+            function showAlert(index = 0) {
+                if (MESSAGES.length > index){
+                    Swal.fire({
+                      text: MESSAGES[index].title,
+                      icon: MESSAGES[index].icon,
+                      title: MESSAGES[index].icon.toUpperCase(),
+                      timer: 3000,
+                    })
+                    .then((result) => {
+                        showAlert(index + 1)
+                    })
+                }
+            }
+            showAlert();
+        })
+    </script>
+    {% endif %}
+
+    {% block script %}
+    {% endblock script %}
+</body>
+</html>

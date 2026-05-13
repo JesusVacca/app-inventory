@@ -1,0 +1,22 @@
+{% if toast_data %}
+<div class="toasts">
+    {% for toast in toast_data   %}
+     <div
+
+        class="toast {% if toast.level %}toast--{{ toast.level }}{% endif %}"
+     >
+        <div class="toast__icon">
+            <i class="{{ toast.icon }}"></i>
+        </div>
+        <div class="toast__message">{{ toast.message }}</div>
+         <button
+                 type="button"
+                 class="toast__close"
+                 onclick="this.closest('.toast').remove()"
+         >
+             <i class="bi bi-x"></i>
+         </button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

@@ -1,0 +1,211 @@
+{% extends 'index.html' %}
+{% load custom_filters %}
+{% load static %}
+{% block title %} Listado de productos {% endblock title %}
+
+{% block main %}
+    <h2 class="title">Listado de Productos</h2>
+    <h4 class="subtitle">Gestión completa del catálogo de productos</h4>
+    <!-- Product table -->
+    <div class="nav">
+        <a href="{% url 'core:products:create' %}" class="button">
+            <i class="bi bi-plus"></i>
+            <span>Agregar producto</span>
+        </a>
+    </div>
+    <form class="filters" method="GET">
+        <div class="filter__group">
+        <label class="filter__label">Buscar</label>
+            <div class="relative">
+                <input
+                        type="text"
+                        placeholder="Buscar por nombre, sku"
+                        class="filter__input"
+                        name="search"
+                        {% if search %} autofocus {% endif %}
+                        value={{ search }}
+
+                >
+                <i class="bi bi-search icon"></i>
+            </div>
+        </div>
+
+        <div class="filter__group">
+            <label class="filter__label">Ventas por tiempo</label>
+            <select class="filter__input">
+                <option value="0">Último día</option>
+                <option value="0">Últimos 7 días</option>
+                <option value="0">Últimos 30 días</option>
+                <option value="0">Último mes</option>
+                <option value="0">Año pasado</option>
+            </select>
+        </div>
+        <div class="filter__group">
+            <label class="filter__label">Categoria</label>
+            <select class="filter__input" name="category_selected" onchange="this.form.submit()">
+            <option value="" selected>Todas las categorías</option>
+            {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if cat.id == category_selected  %} selected {% endif %}>{{ cat.name|upper }}</option>
+            {% endfor %}
+        </select>
+        </div>
+        <div class="filter__group">
+            <label class="filter__label">Marcas</label>
+            <select class="filter__input" name="brand_selected" onchange="this.form.submit()">
+                <option value="" selected>Todas las marcas</option>
+                {% for brand in brands %}
+                <option value="{{ brand.id }}" {% if brand.id == brand_selected  %} selected {% endif %}>{{ brand.name|upper }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+    {% if products %}
+        <div class="scroll card--base">
+            <div class="table">
+                <div class="table__header">
+                    <div class="table__row">
+                        <div class="table__cell table__cell--md">Vista previa</div>
+                        <div class="table__cell table__cell--md">Código</div>
+                        <div class="table__cell">Nombre</div>
+                        <div class="table__cell table__cell--md">Categoría</div>
+                        <div class="table__cell table__cell--sm">Stock</div>
+                        <div class="table__cell">Precio compra</div>
+                        <div class="table__cell">Precio venta</div>
+                        <div class="table__cell">Valor inventario</div>
+                        <div class="table__cell table__cell">Niveles de stock</div>
+                        <div class="table__cell table__cell--md">Acciones</div>
+                    </div>
+                </div>
+                <div class="table__body">
+                    {% for product in products %}
+                        <div class="table__row ">
+                            <div class="table__cell table__cell--md">
+                                <img
+                                        src="{% if product.image %}{{ product.image.url }}{% else %}#{% endif %}"
+                                        alt="{{ product.name }}"
+                                        onerror="this.src='{% static 'image/placeholder.svg' %}'"
+                                        class="table__cell__img"
+                                        data-product-name="{{ product.name }}"
+                                        data-product-description="{{ product.description }}"
+                                        data-product-price="{{ product.price }}"
+                                        data-product-price-sale="{{ product.price_sale }}"
+                                        data-product-category="{{ product.category.name }}"
+                                        data-product-edit="{% url 'core:products:update' pk=product.pk %}"
+
+                                >
+                            </div>
+                            <div class="table__cell table__cell--md">{{ product.sku }}</div>
+                            <div class="table__cell">{{ product.name }}</div>
+                            <div class="table__cell table__cell--md"><p class="badge badge--info">{{ product.category }}</p></div>
+                            <div class="table__cell table__cell--sm">{{ product.stock }}</div>
+                            <div class="table__cell">{{ product.price|format_price }}</div>
+                            <div class="table__cell">{{ product.price_sale|format_price }}</div>
+                            <div class="table__cell">{{ product.stock_value|format_price }}</div>
+                            <div class="table__cell">
+                                {% if product.stock <= product.stock_min %}
+                                    <p class="badge badge--low-stock">Stock bajo</p>
+                                {% elif product.stock <= product.stock_min|add:5 %}
+                                    <p class="badge badge--warning">Advertencia</p>
+                                {% else %}
+                                    <p class="badge badge--normal">Normal</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="table__cell table__cell--md">
+                                <div class="actions">
+                                    <a href="{% url 'core:products:update' pk=product.pk %}" class="action"><i class="bi bi-pencil-square"></i></a>
+                                    {% if product.stock <= product.stock_min %}
+                                    <a href="{% url 'core:products:inventory-input-create' %}?product_sku={{ product.sku }}" class="action action--success" title="Entrada de producto">
+                                        <i class="bi bi-arrow-down-left-circle"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% include 'components/paginations.html' with extra_param=extra_param %}
+    {% else %}
+        <p class="alerts alerts--404">No hay productos registrados</p>
+    {% endif %}
+
+    <!-- End product table -->
+
+    <div class="modal">
+
+    </div>
+
+{% endblock main %}
+
+{% block script %}
+    <script>
+        window.addEventListener('DOMContentLoaded',()=>{
+            const tableImgs = document.querySelectorAll('.table__cell__img');
+            const modal = document.querySelector('.modal');
+            modal.addEventListener('click',()=>modal.classList.remove('open'))
+            tableImgs.forEach(img=>{
+                img.addEventListener('click',()=>{
+
+                    // Extraction datas
+
+                    const productName = img.getAttribute('data-product-name');
+                    const productPrice = img.getAttribute('data-product-price');
+                    const productPriceSale = img.getAttribute('data-product-price-sale');
+                    const productCategory = img.getAttribute('data-product-category');
+                    const productDescription = img.getAttribute('data-product-description');
+                    const productEdit = img.getAttribute('data-product-edit');
+                    const productExpired = parseInt(img.getAttribute('data-product-expired'));
+
+                    let message = '';
+                    if (productExpired){
+                        message = '<p class="badge badge--low-stock badge--absolute">No apto para consumo.</p>';
+                    }
+
+                    modal?.classList.add('open')
+                    modal.innerHTML = '';
+                    const content = document.createElement('div');
+                    content.addEventListener('click',(e)=>e.stopPropagation())
+                    content.setAttribute('class','modal__content card--base');
+
+
+
+                    content.innerHTML = `
+                        ${message}
+                        <div class="modal__header">
+                            <h3 class="subtitle">${productName}</h3>
+                            <img src="${img.src}" alt="${productName}">
+                        </div>
+                        <div class="modal__body">
+                            <div class="modal__row">
+                                Precio compra
+                                <p class="badge badge--info">COP ${productPrice}</p>
+                            </div>
+                            <div class="modal__row">
+                                Precio venta
+                                <p class="badge badge--normal">COP ${productPriceSale}</p>
+                            </div>
+                            <div>
+                                <p class="badge badge--low-stock">${productCategory}</p>
+                            </div>
+                            <div>
+                                <h3 class="subtitle">Descripción</h3>
+                                <p class="badge">${productDescription}</p>
+                            </div>
+                        </div>
+                        <div class="nav">
+                            <a href="${productEdit}" class="button" title="Editar Producto">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                    </div>
+                    `;
+                    modal?.append(content);
+
+                })
+            })
+
+        })
+
+    </script>
+{% endblock script %}

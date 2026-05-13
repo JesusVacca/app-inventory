@@ -1,0 +1,70 @@
+{% extends 'index.html' %}
+{% load custom_filters %}
+{% block title %} Dashboard {% endblock %}
+{% block main %}
+    <h2 class="title">Dashboard</h2>
+    <h4 class="subtitle">Vista general del sistema de inventario</h4>
+    <div class="dashboard">
+
+        <div class="dashboard__row dashboard__row--grid-4">
+            {% for item in LIST_INFO_MAP %}
+            <div class="dashboard__column dashboard__column--{{ item.class }}">
+                <header class="dashboard__column__header">
+                    <p>{{ item.title }}</p>
+                    <i class="{{ item.icon }} dashboard__icon"></i>
+                </header>
+                <div class="dashboard__column__body">
+                    <strong>{{ item.count }}</strong>
+                    <p class="dashboard__column__text">{{ item.text_aux }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if low_stock %}
+        <h4 class="subtitle">Productos con stock bajo</h4>
+        <div class="dashboard__row">
+            {% for item in low_stock %}
+            <div class="dashboard__column dashboard__column--danger">
+                <header class="dashboard__column__header">
+                    <p>{{ item.name }}</p>
+                    <i class="bi bi-exclamation-triangle dashboard__icon"></i>
+                </header>
+                <div class="dashboard__column__body">
+                    <strong>Queda {{ item.stock }}</strong>
+                    <p class="dashboard__column__text">
+                        Necesita revición inmediata. <br>
+                        <a href="{% url 'core:products:list' %}?search={{ item.name }}">
+                            Ver detalles
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if top_products %}
+        <h4 class="subtitle">Top 10 productos más vendidos</h4>
+        <div class="dashboard__row">
+            {% for item in top_products %}
+            <div class="dashboard__column dashboard__column--info">
+                <header class="dashboard__column__header">
+                    <p>{{ item.product__name }}</p>
+                    <i class="bi bi-check dashboard__icon"></i>
+                </header>
+                <div class="dashboard__column__body">
+                    <strong>Elementos vendidos {{ item.total_sold }}</strong>
+                    <p class="dashboard__column__text">
+                        <a href="{% url 'core:products:list' %}?search={{ item.product__name }}">
+                            Ver detalles
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'index.html' %}
+{% block title %}Listado de usuarios{% endblock title %}
+{% block main %}
+    <h2 class="title">Listado de usuarios</h2>
+    <h4 class="subtitle">Gestión de usuarios y roles del sistema</h4>
+    <nav class="nav">
+        <a class="button" href="{% url 'core:accounts:member-create' %}">
+            <i class="bi bi-plus"></i>
+            Registrar usuario
+        </a>
+    </nav>
+    {% if members %}
+        <div class="scroll card--base">
+            <div class="table">
+                <div class="table__header">
+                    <div class="table__row">
+                        <div class="table__cell table__cell--md">#</div>
+                        <div class="table__cell">Nombres</div>
+                        <div class="table__cell">Apellidos</div>
+                        <div class="table__cell">Rol</div>
+                        <div class="table__cell">Correo</div>
+                        <div class="table__cell">Número de télefono</div>
+                        <div class="table__cell table__cell--md">Acciones</div>
+                    </div>
+                </div>
+                <div class="table__body">
+                    {% for member in members %}
+                        <div class="table__row">
+                            <div class="table__cell table__cell--md">{{ forloop.counter }}</div>
+                            <div class="table__cell">{{ member.first_name }}</div>
+                            <div class="table__cell">{{ member.last_name }}</div>
+                            <div class="table__cell"><p class="badge badge--{{ member.role|lower|slugify }}">{{ member.role }}</p></div>
+                            <div class="table__cell">{{ member.email }}</div>
+                            <div class="table__cell">{{ member.phone_number }}</div>
+                            <div class="table__cell table__cell--md">
+                                <div class="actions">
+                                    <a href="{% url 'core:accounts:member-update' pk=member.pk %}" class="action">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% include 'components/paginations.html' with extra_param=extra_param %}
+    {% else %}
+        <p class="alerts alerts--404">No hay usuarios registrados</p>
+    {% endif %}
+
+
+{% endblock main %}

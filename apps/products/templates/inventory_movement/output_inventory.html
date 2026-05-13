@@ -1,0 +1,66 @@
+{% extends 'index.html' %}
+{% block title %} Salida de Inventario {% endblock title %}
+{% block main %}
+    <h2 class="title">Salida de Inventario</h2>
+    <h4 class="subtitle">Registro de productos que salen del inventario</h4>
+
+    <nav class="nav">
+        <a href="{% url 'core:products:inventory-output-create' %}" class="button">
+            <i class="bi bi-plus"></i>
+            Registrar salida
+        </a>
+    </nav>
+
+    {% if ouput_movements %}
+        <div class="scroll card--base">
+            <div class="table">
+                <div class="table__header">
+                    <div class="table__row">
+                        <div class="table__cell">Fecha</div>
+                        <div class="table__cell">Código</div>
+                        <div class="table__cell">Producto</div>
+                        <div class="table__cell table__cell--md">Cantidad</div>
+                        <div class="table__cell">Destino</div>
+                        <div class="table__cell">Motivo</div>
+                        <div class="table__cell">Usuario</div>
+                    </div>
+                </div>
+                <div class="table__body">
+                    {% for movement in ouput_movements %}
+                        <div class="table__row">
+                            <div class="table__cell">
+                                <p class="badge badge--info">
+                                    <i class="bi bi-calendar3"></i>
+                                    {{ movement.created_at|date:"d/m/Y H:i" }}
+                                </p>
+                            </div>
+                            <div class="table__cell">{{ movement.product.sku }}</div>
+                            <div class="table__cell">{{ movement.product }}</div>
+                            <div class="table__cell table__cell--md">
+                                <p class="badge badge--low-stock">
+                                    -
+                                    {{ movement.quantity }}
+                                </p>
+                            </div>
+                            <div class="table__cell">{% if movement.destination %}{{ movement.destination }}{% else %}<p class="badge">N/A</p>{% endif %}</div>
+                            <div class="table__cell"><p class="badge badge--normal">{{ movement.reason }}</p></div>
+                            <div class="table__cell">
+                                <p class="badge badge--info">
+                                    <i class="bi bi-person"></i>
+                                    {{ movement.user }}
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% include 'components/paginations.html' %}
+    {% else %}
+        <p class="alerts alerts--404">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            No hay entradas registradas
+        </p>
+    {% endif %}
+
+{% endblock main %}

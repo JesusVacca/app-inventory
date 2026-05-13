@@ -1,0 +1,179 @@
+{% extends 'index.html' %}
+{% load custom_filters %}
+{% block main %}
+    <h2 class="title">Listado de productos - Venta #{{ order.pk }}</h2>
+    <form class="filters">
+        <div class="filter__group">
+            <div class="relative">
+                <input
+                        type="text"
+                        class="filter__input"
+                        placeholder="Buscar producto"
+                        name="search"
+                        value="{{ search }}"
+                >
+                <i class="bi bi-search icon"></i>
+            </div>
+        </div>
+    </form>
+    <div class="flex">
+        {% if products %}
+        <div class="gallery">
+            {% for product in products %}
+                <div class="gallery__item card--base">
+                    <div class="gallery__img">
+                        <img src="{% if product.image %}{{ product.image.url }}{% else %}#{% endif %}" alt="{{ product.name }}">
+                    </div>
+                    <div class="gallery__text">{{ product.name }}</div>
+                    <div class="gallery__text">Precio venta {{ product.price_sale|format_price }}</div>
+                    <button
+                            type="button"
+                            class="button"
+                            data-product-sku="{{ product.sku }}"
+                            data-product-name="{{ product.name }} - {{ product.brand }}"
+                            data-product-price="{{ product.price_sale }}"
+                            data-product-max-price="{{ product.stock_value }}"
+                            data-url="{% url 'core:orders:add-item-to-order' pk=request.session.order_id %}"
+                    >
+                        <span>Selecionar producto</span>
+                        <i class="bi bi-check-circle"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p class="alerts alerts--404">No hay productos disponibles</p>
+        {% endif %}
+        <div class="summary card--base">
+            <h3 class="summary__title">Detalles de venta <br> Intereses {{ order.interest_rate }}%</h3>
+            <div class="summary__table">
+                <div class="summary__row summary__row--header">
+                    <div class="summary__column">Producto</div>
+                    <div class="summary__column">Unidades</div>
+                    <div class="summary__column">Subtotal</div>
+                </div>
+                {% for item in order.items.all %}
+                    <div class="summary__row">
+                        <div class="summary__column">{{ item.product }}</div>
+                        <div class="summary__column">{{ item.quantity }}</div>
+                        <div class="summary__column">{{ item.subtotal|format_price }}</div>
+                    </div>
+                {% endfor %}
+                <div class="summary__row summary__row--header">
+                    <div class="summary__column">Total a pagar</div>
+                    <div class="summary__column">{{ total|format_price }}</div>
+                </div>
+
+
+            </div>
+            <nav class="nav">
+                <button
+                        type="button"
+                        data-url="{% url 'core:orders:delete-order' pk=order.pk %}"
+                        class="button button--outline"
+                        id="deleteOrder"
+                >
+                    Cancelar venta
+                </button>
+                <button
+                        type="button"
+                        data-url="{% url 'core:orders:confirm-order' pk=order.pk %}"
+                        class="button"
+                        id="confirmOrder"
+                >
+                    Confirmar venta
+                </button>
+            </nav>
+        </div>
+
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="form__container"></div>
+    </div>
+{% endblock main %}
+
+{% block script %}
+    <script>
+        window.addEventListener('DOMContentLoaded',()=>{
+            const buttonGallery = document.querySelectorAll('.gallery button.button');
+            const modal = document.getElementById('modal');
+            const modalContent = modal.querySelector('.form__container');
+
+            const buttonConfirm = document.querySelector('#confirmOrder');
+            const buttonCancel = document.querySelector('#deleteOrder');
+
+
+            const showAlerts =(icon, message, urlRedirect, confirm='Si', cancel='No, cancelar' )=>{
+                try {
+                    Swal.fire({
+                        icon:icon,
+                        title: message,
+                        showCancelButton: true,
+                        confirmButtonText: confirm,
+                        cancelButtonText:cancel,
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = urlRedirect;
+                        }
+                      });
+                }catch(err){
+                    alert(message)
+                    window.location.href = urlRedirect;
+                }
+            }
+
+            buttonCancel.addEventListener('click',(e)=>{
+                const dataUrl = e.target.getAttribute('data-url');
+                showAlerts(
+                    'info',
+                    '¿Esta seguro que desea eliminar esta venta?',
+                    dataUrl,
+                )
+            })
+            buttonConfirm.addEventListener('click',(e)=>{
+                const dataUrl = e.target.getAttribute('data-url');
+                showAlerts(
+                    'info',
+                    '¿Esta seguro que desea confirmar esta venta?',
+                    dataUrl,
+                )
+            })
+
+
+            modalContent.addEventListener('click',(e)=>e.stopPropagation())
+
+            modal.addEventListener('click', (e)=>modal.classList.remove('open'))
+            buttonGallery.forEach((button)=>{
+                button.addEventListener('click',()=>{
+
+                    const productName = button.getAttribute('data-product-name');
+                    const productPrice = button.getAttribute('data-product-price');
+                    const productSKU = button.getAttribute('data-product-sku');
+                    const productMaxPrice = button.getAttribute('data-product-max-price');
+                    const url = button.getAttribute('data-url');
+                    modal.setAttribute('class','modal open');
+
+                    modalContent.innerHTML = `
+                        <div class="form__header">
+                            <h2 class="form__title">${productName}</h2>
+                        </div>
+                        <form method="POST" action="${url}">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_sku" value="${productSKU}">
+                            <div class="form__group">
+                                <label class="form__label" for="amount" data-required="True">Cantidad</label>
+                                <input type="number" class="form__input" id="amount" name="amount" placeholder="Eje: 5000" required max="${parseInt(productMaxPrice)}">
+                            </div>
+                            <div class="form__group">
+                                <button type="submit" class="button">Añadir al carrito</button>
+                            </div>
+                        </form>
+                    `
+
+
+                })
+            })
+        })
+    </script>
+{% endblock script %}

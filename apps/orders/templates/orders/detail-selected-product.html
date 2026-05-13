@@ -1,0 +1,35 @@
+{% extends 'index.html' %}
+{% load custom_filters %}
+{% block title %}{{ product }}{% endblock %}
+
+{% block main %}
+    <div class="form__container">
+        <div class="form__header">
+            <h2 class="form__title">{{ product }}</h2>
+            <hr>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="product_sku" value="{{ product.sku }}">
+            <div class="form__group">
+                <label class="form__label" for="amount" data-required="True">Cantidad (Pesos)</label>
+                <input
+                        class="form__input"
+                        type="number"
+                        name="amount"
+                        id="amount"
+                        required
+                        min="{{ product.stock_value }}"
+                        placeholder="Ej: {{ product.price_sale }}"
+                />
+            </div>
+            <div class="form__group">
+                <button class="button" type="submit">
+                    <i class="bi bi-cart-plus"></i>
+                    Añadir Producto
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock main %}
+

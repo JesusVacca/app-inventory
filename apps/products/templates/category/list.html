@@ -1,0 +1,60 @@
+{% extends 'index.html' %}
+{% block title %} Categorías {% endblock title %}
+{% block main %}
+    <h2 class="title">Categorías de producto</h2>
+    <nav class="nav">
+        <a href="{% url 'core:products:category-create' %}" class="button">
+            <i class="bi bi-plus"></i>
+            <span>Nueva categoría</span>
+        </a>
+    </nav>
+
+    {% if categories %}
+
+        <div class="scroll card--base">
+            <div class="table">
+                <div class="table__header">
+                    <div class="table__row">
+                        <div class="table__cell table__cell--sm">#</div>
+                        <div class="table__cell">Nombre</div>
+                        <div class="table__cell table__cell--sm">Productos</div>
+                        <div class="table__cell">Descripción</div>
+                        <div class="table__cell">Acciones</div>
+                    </div>
+                </div>
+                <div class="table__body">
+                    {% for category in categories %}
+                        <div class="table__row">
+                            <div class="table__cell table__cell--sm">{{ forloop.counter }}</div>
+                            <div class="table__cell">{{ category.name }}</div>
+                            <div class="table__cell table__cell--sm">{{ category.count }}</div>
+                            <div class="table__cell">
+                                {% if category.description %}
+                                    <p class="badge badge--info">
+                                    {{ category.description }}
+                                    </p>
+                                {% else %}
+                                    <p class="badge">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        Sin descripción
+                                    </p>
+                                {% endif %}
+                            </div>
+                            <div class="table__cell">
+                                <div class="actions">
+                                    <a href="{% url 'core:products:category-update' category.pk %}" class="action">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <p class="badge">No hay categorías registradas</p>
+    {% endif %}
+
+{% endblock main %}

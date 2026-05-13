@@ -1,0 +1,20 @@
+{% extends 'index.html' %}
+
+{% block main %}
+
+    <div class="form__container form__container-md">
+        <div class="form__header">
+            <h2 class="title">Abonos</h2>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            {% include 'components/form-render.html' %}
+            <div class="form__group">
+                <button type="submit" class="button">
+                    Registrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+{% endblock main %}

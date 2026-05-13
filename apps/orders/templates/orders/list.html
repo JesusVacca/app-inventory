@@ -1,0 +1,120 @@
+{% extends 'index.html' %}
+{% load custom_filters %}
+{% block title %} Listado de ventas {% endblock title %}
+{% block main %}
+
+
+    <h2 class="title">Listado de ventas</h2>
+    <nav class="nav">
+        <a href="{% url 'core:orders:create' %}" class="button">
+            <i class="bi bi-plus"></i>
+            Registrar venta
+        </a>
+    </nav>
+    <form class="filters">
+        <div class="filter__group">
+            <label class="filter__label">Buscar</label>
+            <div class="relative">
+                <input type="text" class="filter__input" placeholder="Buscar por cliente" name="search" value="{{ search }}">
+                <i class="bi bi-search icon"></i>
+            </div>
+        </div>
+
+        <div class="filter__group">
+            <label class="filter__label">Estado de pago</label>
+            <select class="filter__input" name="arrears" onchange="this.form.submit()">
+                <option value="" {% if not request.GET.mora %}selected{% endif %}>Todas las ventas</option>
+                <option value="0" {% if arrears == '0' %}selected{% endif %}>Ventas al día</option>
+                <option value="1" {% if arrears == '1' %}selected{% endif %}>Ventas en mora</option>
+            </select>
+        </div>
+        <div class="filter__group">
+            <label class="filter__label">Estado de la venta</label>
+            <select class="filter__input" name="status" onchange="this.form.submit()">
+                <option value="" selected>Selecionar estado de venta</option>
+                {% for item in order_status.choices %}
+                <option value="{{ item.0 }}" {% if item.0 == status %}selected{% endif %}>{{ item.0 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+
+
+        <div class="filter__group">
+            <label class="filter__label" for="filter">Fecha inicio</label>
+            <input
+                    type="date" class="filter__input"
+                    name="date_start"
+                    onchange="this.form.submit();"
+                    value="{{ date_start }}"
+            >
+        </div>
+        <div class="filter__group">
+            <label class="filter__label" for="filter">Fecha fin</label>
+            <input
+                    type="date"
+                    class="filter__input"
+                    name="date_end"
+                    onchange="this.form.submit();"
+                    value="{{ date_end }}"
+            >
+        </div>
+
+    </form>
+    {% if orders %}
+    <div class="scroll card--base">
+        <div class="table">
+            <div class="table__header">
+                <div class="table__row">
+                    <div class="table__cell table__cell--sm">#</div>
+                    <div class="table__cell">Cliente</div>
+                    <div class="table__cell">Total a pagar</div>
+                    <div class="table__cell">Total a deuda</div>
+                    <div class="table__cell">Metodo de pago</div>
+                    <div class="table__cell">Plazo a pagar</div>
+                    <div class="table__cell">Estado</div>
+                    <div class="table__cell">Accciones</div>
+                </div>
+            </div>
+            <div class="table__body">
+                {% for order in orders %}
+                    <div class="table__row {% if order.is_in_arrears %} table__row--expired {% endif %}">
+                        <div class="table__cell table__cell--sm">{{forloop.counter}}</div>
+                        <div class="table__cell"><p class="badge">{% if not order.customer %}N/A{% else %}{{ order.customer }}{% endif %}</p></div>
+                        <div class="table__cell">{{order.total_to_pay|format_price}}</div>
+                        <div class="table__cell">
+                            {% if order.status == 'Pendiente' %}
+                                {{order.total|format_price}}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                        <div class="table__cell"><p class="badge badge--info">{{order.payment_method}}</p></div>
+                        <div class="table__cell"><p class="badge badge--info">{% if not order.interest_rate %}N/A{% else %}{{order.deadline_date|date}}{% endif %}</p></div>
+                        <div class="table__cell"><p class="badge badge--{{order.status|lower|slugify}}">{{order.status}}</p></div>
+                        <div class="table__cell">
+                            <div class="actions">
+
+                                {% if order.status == 'Pendiente' %}
+                                    <a
+                                            href="{% url 'core:orders:sale-payments-create' %}?sale-id={{ order.id }}"
+                                            class="action" title="Agregar abono">
+                                        <i class="bi bi-cash-coin"></i>
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'core:orders:delete-order' pk=order.pk %}" class="action action--danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+        <p class="alerts alerts--404">No hay ventas registradas</p>
+    {% endif %}
+
+{% endblock main %}

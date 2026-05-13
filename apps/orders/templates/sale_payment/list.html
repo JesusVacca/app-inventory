@@ -1,0 +1,63 @@
+{% extends 'index.html' %}
+{% load custom_filters %}
+{% block title %} Listado de abonos {% endblock %}
+{% block main %}
+    <h2 class="title">Listado de abonos</h2>
+    <h4 class="subtitle"> Consulta los pagos realizados por los clientes a sus ventas pendientes.</h4>
+
+    <nav class="nav">
+        <a class="button" href="{% url 'core:orders:sale-payments-create' %}">
+            <i class="bi bi-plus"></i>
+            Registrar abono
+        </a>
+    </nav>
+
+    <form class="filters">
+        <div class="filter__group">
+            <label class="filter__label">Buscar abono por cliente</label>
+            <div class="relative">
+                <input
+                        type="text"
+                        class="filter__input"
+                        placeholder="Ej: Carlos Antonio"
+                        name="search"
+                        value="{{ search }}"
+                >
+                <i class="bi bi-search icon"></i>
+            </div>
+        </div>
+
+    </form>
+
+    {% if sale_payments %}
+    <div class="scroll card--base">
+        <div class="table">
+            <div class="table__header">
+                <div class="table__row">
+                    <div class="table__cell table__cell--sm">#</div>
+                    <div class="table__cell">Venta</div>
+                    <div class="table__cell">Cliente</div>
+                    <div class="table__cell">Cantidad (Pesos)</div>
+                    <div class="table__cell">Metodo de pago</div>
+                    <div class="table__cell">Fecha de registro</div>
+                </div>
+            </div>
+            <div class="table__body">
+                {% for sale_payment in sale_payments %}
+                    <div class="table__row">
+                        <div class="table__cell table__cell--sm">{{ forloop.counter }}</div>
+                        <div class="table__cell">{{ sale_payment.sale.id }}</div>
+                        <div class="table__cell">{{ sale_payment.customer.first_name }}</div>
+                        <div class="table__cell">{{ sale_payment.amount|format_price }}</div>
+                        <div class="table__cell"><p class="badge">{{ sale_payment.payment_method }}</p></div>
+                        <div class="table__cell"><p class="badge badge--info">{{ sale_payment.payment_date }}</p></div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p class="alerts alerts--404">No hay abonos registrado</p>
+    {% endif %}
+
+{% endblock %}

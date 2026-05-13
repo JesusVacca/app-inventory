@@ -1,0 +1,47 @@
+{% extends 'index.html' %}
+
+{% block main %}
+
+    <div class="form__container form__container-lg">
+        <div class="form__header">
+            <h2 class="title">Datos de la venta</h2>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            {% include 'components/form-render.html' %}
+            <div class="form__group">
+                <button type="submit" class="button">
+                    Selecionar productos
+                </button>
+            </div>
+        </form>
+    </div>
+
+{% endblock main %}
+
+{% block script %}
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const paymentMethod = document.querySelector('#id_payment_method');
+            const interestRate = document.querySelector('#id_interest_rate');
+            const deadlineDate = document.querySelector('#id_deadline_date');
+
+            const initStatusInputInterestRate =()=>{
+                if(paymentMethod && paymentMethod.value === 'Credito'){
+                    interestRate.removeAttribute('readonly');
+                    deadlineDate.setAttribute('required', true)
+                }
+                else {
+                    interestRate.setAttribute('readonly',true);
+                    interestRate.value=0;
+                    interestRate.textContent=0;
+                    deadlineDate.removeAttribute('required')
+                }
+            }
+            paymentMethod.addEventListener('change', initStatusInputInterestRate);
+            initStatusInputInterestRate();
+
+
+        })
+    </script>
+{% endblock script %}

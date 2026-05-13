@@ -1,0 +1,105 @@
+{% extends 'index.html' %}
+{% block title %} Crear producto{% endblock %}
+{% block main %}
+    <div class="nav">
+        <a href="{% url 'core:accounts:member-list' %}" class="button">
+            <i class="bi bi-arrow-left"></i>
+            <span>Regresar</span>
+        </a>
+    </div>
+    <div class="form__container form__container-lg">
+        <div class="form__header">
+            <h1 class="form__title">{% if is_updated %}Actualización{% else %}Creación{% endif %} de usuarios</h1>
+            <p class="form__subtitle">
+                Para {% if is_updated %}actualizar{% else %}crear{% endif %} un usuario, por favor llenar los campos requeridos.
+            </p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form__group form__group--grid">
+                <div>
+                    <label class="form__label" for="id_first_name" data-required="True">Nombres</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <p class="error__text">{{ form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form__label" for="id_last_name">Apellidos</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <p class="error__text">{{ form.last_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form__group form__group--grid">
+                <div>
+                    <label class="form__label" for="id_email" data-required="True">Correo electrónico</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <p class="error__text">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form__label" for="id_last_name">Número de telefono</label>
+                    {{ form.phone_number }}
+                    {% if form.phone_number.errors %}
+                        <p class="error__text">{{ form.phone_number.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form__group">
+                <label class="form__label" for="id_role" data-required="True">Rol</label>
+                {{ form.role }}
+                {% if form.role.errors %}
+                    <p class="error__text">{{ form.role.errors.0 }}</p>
+                {% endif %}
+            </div>
+            <div class="form__group">
+                <label class="form__label" for="id_custom_password" {% if not form.instance.pk %}data-required="True"{% endif %}>Contraseña</label>
+                {{ form.custom_password }}
+                {% if form.custom_password.errors %}
+                    <p class="error__text">{{ form.password.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form__group">
+                <button type="submit" class="button button--fw">
+                    {% if is_updated %}Actualizar{% else %}Crear{% endif %} usuario
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock main %}
+{% block script %}
+
+    <script>
+        window.addEventListener('DOMContentLoaded',()=>{
+            const selectRole = document.querySelector('#id_role');
+            const inputPassword = document.querySelector('#id_custom_password');
+
+            const handleRoleSelect = (e) => {
+                const value = selectRole.value;
+                const parentInput = inputPassword.parentElement;
+                if(value === 'Cliente'){
+                    inputPassword.setAttribute('readOnly','true');
+                    parentInput.setAttribute('style','opacity:0');
+                    inputPassword.removeAttribute('required');
+                }
+                else {
+                    inputPassword.removeAttribute('readOnly');
+                    inputPassword.setAttribute('type','password');
+                    inputPassword.setAttribute('required',true);
+                    parentInput.setAttribute('style','opacity:1');
+                }
+            }
+            selectRole.addEventListener('change',handleRoleSelect)
+            handleRoleSelect()
+
+        })
+    </script>
+
+{% endblock script %}

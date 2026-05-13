@@ -1,0 +1,29 @@
+{% if is_paginated %}
+<div class="nav card--base">
+    <!-- Botón "Anterior" -->
+    <a
+            href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% if extra_param %}&{{ extra_param }}{% endif %}{% else %}#{% endif %}"
+            class="button button--outline {% if not page_obj.has_previous %}button--disabled{% endif %}"
+    >
+        <i class="bi bi-arrow-left"></i>
+        <span>Anterior</span>
+    </a>
+    <!-- Botones de páginas (rango dinámico) -->
+    {% for num in paginator.page_range %}
+        {% if num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
+            {% if num == page_obj.number %}
+                <span class="button button--focus">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}{% if extra_param %}&{{ extra_param }}{% endif %}" class="button button--outline">{{ num }}</a>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    <!-- Botón "Siguiente" -->
+    <a
+            href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% if extra_param %}&{{ extra_param }}{% endif %}{% else %}#{% endif %}"
+            class="button button--outline {% if not page_obj.has_next %}button--disabled{% endif %}">
+        <span>Siguiente</span>
+        <i class="bi bi-arrow-right"></i>
+    </a>
+</div>
+{% endif %}

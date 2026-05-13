@@ -1,0 +1,28 @@
+{% extends 'index.html' %}
+{% block title %}{{ title }}{% endblock title %}
+{% block main %}
+    <div class="nav">
+        <a
+                href="{{ back_url }}"
+                class="button"
+        >
+            <i class="bi bi-arrow-left"></i>
+            <span>Regresar</span>
+        </a>
+    </div>
+    <div class="form__container form__container-md">
+        <div class="form__header">
+            <h1 class="form__title">{{title}}</h1>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_custom_form }}
+            <div class="form__group">
+                <button type="submit" class="button button--fw">Registrar acción</button>
+            </div>
+        </form>
+    </div>
+
+
+{% endblock main %}
