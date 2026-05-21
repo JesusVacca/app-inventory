@@ -11,14 +11,18 @@
     </title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 </head>
 <body>
-    <div class="page">
+    <div class="page" style="background-image: url('{% static "image/brand.jpeg" %}')">
         <aside class="sidebar">
             <header class="sidebar__header">
-                <i class="bi bi-shop-window"></i>
-                <span class="sidebar__title">Pink Notes</span>
+                <img src="{% static 'image/brand.jpeg' %}" alt="brand" class="brand__img">
+                <p class="sidebar__title">Papelería <span>Yusuqui</span></p>
             </header>
             <ul class="menu">
                 <li class="menu__item">

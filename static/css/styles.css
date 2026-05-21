@@ -6,17 +6,22 @@
 }
 
 :root {
-    --color-primary: #A85A72;        /* Rosa malva más profundo */
-    --color-primary-light: #C97891;  /* Rosa suave oscuro */
-    --color-accent: #E89A7D;         /* Durazno más cálido */
-    --color-background: #FBECEF;     /* Fondo rosado suave */
-    --color-white: #FFFFFF;       /* Blanco - Tarjetas y texto */
 
-    --color-success: #7BC9A7;   /* Verde pastel elegante */
-    --color-warning: #F7C873;   /* Amarillo cálido suave */
-    --color-danger:  #E78AAE;   /* Rosa rojizo */
-    --color-info:    #8FA8FF;   /* Azul lavanda */
-    --color-muted:   #C9C5D3;
+    --color-primary: #F21874;        /* Rosa fuerte del logo */
+    --color-primary-light: #FF5CA8;  /* Rosa brillante suave */
+
+    --color-accent: #FF9F1C;         /* Naranja del borde y detalles */
+    --color-background: #FFF7FB;     /* Fondo claro inspirado en el blanco del logo */
+    --color-white: #FFFFFF;
+
+    --color-success: #57B80F;        /* Verde de "VARIEDADES" */
+    --color-warning: #FFC233;        /* Amarillo cálido de útiles */
+    --color-danger:  #E91E63;        /* Rosa intenso complementario */
+    --color-info:    #1E88E5;        /* Azul decorativo del logo */
+    --color-muted:   #CFC7D8;
+
+
+
 
     /* Shadows and borders */
     --shadow-sm: 0 2px 4px rgba(44, 62, 80, 0.1);
@@ -25,6 +30,13 @@
     --shadow: 0 10px 30px rgba(44, 62, 80, 0.4);
     --border-radius: 12px;
     --border-radius-sm: 8px;
+}
+
+h1,h2, h3, h4, h5, h6{
+    font-family: 'Fredoka', sans-serif;
+}
+body{
+    font-family: 'Nunito', sans-serif;
 }
 
 /* Estilos reutilizables */
@@ -362,18 +374,28 @@ body {
     width: 100%;
     min-height: 100dvh;
     background: var(--color-background);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-attachment: fixed;
     overflow: auto;
 }
 .page__content__login{
     width: 100%;
+    min-height: 100dvh;
     padding: 5vw;
+    backdrop-filter: blur(4px);
 }
 .page__content{
-    width: calc(100% - 250px);
-    margin-left: 250px;
+    width: calc(100% - 300px);
+    margin-left: 300px;
     padding: 3vw;
     position: relative;
     transition: all .1s ease-in-out;
+    backdrop-filter: blur(4px);
+    background: rgba(255, 255, 255, 0.25);
+    height: 100dvh;
+    overflow: auto;
 }
 .page__header{
     width: 100%;
@@ -392,7 +414,7 @@ body {
 /* Sidebar */
 /* Sidebar mejorado */
 .sidebar {
-    width: 250px;
+    width: 300px;
     min-height: 100dvh;
     padding: 1.5rem 1rem;
     background: var(--color-primary-light);
@@ -417,17 +439,19 @@ body {
     padding-bottom: 1.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
-
-.sidebar__header i {
-    font-size: 1.5rem;
-    color: var(--color-accent);
+.brand__img{
+    width: 80px;
+    aspect-ratio: 1/1;
+    border-radius: 1rem;
 }
-
 .sidebar__title {
     font-size: 1.3rem;
-    font-weight: 700;
+    font-weight: bold;
     letter-spacing: 0.5px;
+    font-family: 'Fredoka', sans-serif;
+
 }
+.sidebar__title span{color:var(--color-muted)}
 .sidebar__toggle:hover {
     transform: scale(1.1);
 }
@@ -561,6 +585,9 @@ body {
     .sidebar {
         width: 70px;
         padding: 1rem 0.5rem;
+    }
+    .brand__img{
+        width: 100%;
     }
 
     .sidebar__title {

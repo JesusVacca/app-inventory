@@ -130,3 +130,4 @@ AUTH_USER_MODEL = 'accounts.Member'
 LOGIN_URL = 'core:accounts:login'
 LOGOUT_URL = 'core:accounts:logout'
 LOGIN_REDIRECT_URL = 'core:dashboard:dashboard'
+
